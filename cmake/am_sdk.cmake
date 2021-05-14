@@ -1,4 +1,4 @@
-set(AM_SDK_HAL ${AM_SDK_PATH}/mcu/apollo3/hal)
+set(AM_SDK_HAL $ENV{AM_SDK_PATH}/mcu/apollo3/hal)
 
 add_library(am_sdk_hal
   ${AM_SDK_HAL}/am_hal_iom.c
@@ -35,7 +35,11 @@ add_library(am_sdk_hal
   ${AM_SDK_HAL}/am_hal_ios.c
   ${AM_SDK_HAL}/am_hal_itm.c)
 
-target_include_directories(am_sdk_hal PUBLIC ${AM_SDK_HAL} ${AM_SDK_HAL}/../regs ${AM_SDK_HAL}/../ ${AM_SDK_PATH}/CMSIS/AmbiqMicro/Include ${AM_SDK_PATH}/CMSIS/ARM/Include)
+target_include_directories(am_sdk_hal PUBLIC
+  ${AM_SDK_HAL}
+  ${AM_SDK_HAL}/../regs
+  ${AM_SDK_HAL}/../
+  $ENV{AM_SDK_PATH}/CMSIS/AmbiqMicro/Include $ENV{AM_SDK_PATH}/CMSIS/ARM/Include)
 
 target_compile_definitions(am_sdk_hal PUBLIC
   PART_apollo3
@@ -46,7 +50,7 @@ target_compile_definitions(am_sdk_hal PUBLIC
   # Needed?
   gcc)
 
-set(AM_SDK_FREERTOS ${AM_SDK_PATH}/third_party/FreeRTOSv10.1.1/Source)
+set(AM_SDK_FREERTOS $ENV{AM_SDK_PATH}/third_party/FreeRTOSv10.1.1/Source)
 
 add_library(am_sdk_freertos
   ${AM_SDK_FREERTOS}/croutine.c
@@ -72,7 +76,7 @@ target_include_directories(am_sdk_freertos PUBLIC
 
 target_link_libraries(am_sdk_freertos am_sdk_hal)
 
-set(AM_SDK_UTILS ${AM_SDK_PATH}/utils)
+set(AM_SDK_UTILS $ENV{AM_SDK_PATH}/utils)
 
 add_library(am_sdk_utils
   ${AM_SDK_UTILS}/am_util_delay.c
@@ -97,7 +101,7 @@ target_include_directories(am_sdk_utils PUBLIC ${AM_SDK_UTILS})
 
 target_link_libraries(am_sdk_utils am_sdk_hal)
 
-set(AM_SDK_CORDIO ${AM_SDK_PATH}/third_party/cordio)
+set(AM_SDK_CORDIO $ENV{AM_SDK_PATH}/third_party/cordio)
 
 add_library(am_sdk_cordio
   ${AM_SDK_CORDIO}/wsf/sources/port/freertos/wsf_assert.c
