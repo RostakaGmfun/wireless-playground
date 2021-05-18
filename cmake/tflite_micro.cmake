@@ -107,5 +107,5 @@ add_library(tflite_micro
 target_include_directories(tflite_micro PUBLIC
   $ENV{TF_PATH}
   ${TFLITE_SRC}/micro/tools/make/downloads/gemmlowp
-  $ENV{TF_PATH}/flatbuffers/include
+  ${TFLITE_SRC}/micro/tools/make/downloads/flatbuffers/include
   ${TFLITE_SRC}/micro/tools/make/downloads/ruy)
