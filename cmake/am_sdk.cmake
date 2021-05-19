@@ -59,6 +59,7 @@ add_library(am_sdk_freertos
   ${AM_SDK_FREERTOS}/queue.c
   ${AM_SDK_FREERTOS}/stream_buffer.c
   ${AM_SDK_FREERTOS}/tasks.c
+  ${AM_SDK_FREERTOS}/timers.c
   ${AM_SDK_FREERTOS}/portable/MemMang/heap_4.c
   ${AM_SDK_FREERTOS}/portable/GCC/AMapollo2/port.c)
 

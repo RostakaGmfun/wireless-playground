@@ -123,7 +123,7 @@ static uint32_t g_pui32Stack[0xac0];
 // Therefore, we'll explicitly use am_fault_isr in the table for those vectors.
 //
 //*****************************************************************************
-__attribute__ ((section(".isr_vector")))
+__attribute__ ((section(".isr_vector"), used))
 void (* const g_am_pfnVectors[])(void) =
 {
     (void (*)(void))((uint32_t)g_pui32Stack + sizeof(g_pui32Stack)),

@@ -67,7 +67,7 @@ extern "C"
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
 
-#define configUSE_MUTEXES                       0
+#define configUSE_MUTEXES                       1
 #define configUSE_RECURSIVE_MUTEXES             0
 #define configUSE_COUNTING_SEMAPHORES           0
 #define configUSE_ALTERNATIVE_API               0 /* Deprecated! */
@@ -109,11 +109,11 @@ extern "C"
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet                0
 #define INCLUDE_uxTaskPriorityGet               0
-#define INCLUDE_vTaskDelete                     0
+#define INCLUDE_vTaskDelete                     1
 #define INCLUDE_vTaskSuspend                    1
 #define INCLUDE_xResumeFromISR                  0
-#define INCLUDE_vTaskDelayUntil                 1
-#define INCLUDE_vTaskDelay                      0
+#define INCLUDE_vTaskDelayUntil                 0
+#define INCLUDE_vTaskDelay                      1
 #define INCLUDE_xTaskGetSchedulerState          0
 #define INCLUDE_xTaskGetCurrentTaskHandle       0
 #define INCLUDE_uxTaskGetStackHighWaterMark     0
@@ -132,15 +132,15 @@ extern "C"
 #define configUSE_TICKLESS_IDLE                   2 // Ambiq specific implementation for Tickless
 
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-extern uint32_t am_freertos_sleep(uint32_t);
-extern void am_freertos_wakeup(uint32_t);
+uint32_t wi_freertos_sleep(uint32_t);
+void wi_freertos_wakeup(uint32_t);
 
 #define configPRE_SLEEP_PROCESSING( time ) \
     do { \
-        (time) = am_freertos_sleep(time); \
+        (time) = wi_freertos_sleep(time); \
     } while (0);
 
-#define configPOST_SLEEP_PROCESSING(time)    am_freertos_wakeup(time)
+#define configPOST_SLEEP_PROCESSING(time)    wi_freertos_wakeup(time)
 #endif
 /*-----------------------------------------------------------*/
 #ifndef AM_PART_APOLLO

@@ -1,3 +1,6 @@
+#include <stddef.h>
+#include <sys/time.h>
+
 int _write(int fd, const char *buf, int count)
 {
     return -1;
@@ -48,4 +51,19 @@ void _exit(int arg)
 void _putchar(char character)
 {
     (void)character;
+}
+
+int _getpid(void)
+{
+    return 0;
+}
+
+int _gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+    if (NULL != tv) {
+        tv->tv_sec = 0;
+        tv->tv_usec = 0;
+    }
+
+    return 0;
 }
