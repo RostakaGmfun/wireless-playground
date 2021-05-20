@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <cstddef>
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 namespace wi
 {
@@ -9,7 +11,7 @@ namespace wi
 class port_i2c
 {
 public:
-    port_i2c(int id);
+    port_i2c(int id, unsigned int clock_speed_hz = 100000);
     ~port_i2c();
 
     port_i2c(const port_i2c &other) = delete;
@@ -35,6 +37,9 @@ public:
 
 private:
     int id_;
+    void *i2c_handle_;
+    SemaphoreHandle_t i2c_semaphore_;
+    SemaphoreHandle_t i2c_mutex_;
 };
 
 } // namespace wi

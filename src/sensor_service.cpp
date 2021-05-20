@@ -1,6 +1,6 @@
 #include "sensor_service.hpp"
 #include "FreeRTOS.h"
-#include "tasks.h"
+#include "task.h"
 
 #include "drivers/sht3x.hpp"
 #include "bsp/wi_bsp.hpp"

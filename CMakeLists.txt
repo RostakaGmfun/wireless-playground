@@ -19,7 +19,8 @@ add_subdirectory(lib)
 add_executable(wi-fw
   src/main.cpp
   src/libc_stubs.c
-  src/freertos_hooks.cpp)
+  src/freertos_hooks.cpp
+  src/sensor_service.cpp)
 
 target_link_libraries(wi-fw
   wi_port
