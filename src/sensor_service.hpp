@@ -21,7 +21,7 @@ private:
 
     static constexpr auto STACK_SIZE = 512;
     static constexpr auto PRIORITY = 1;
-    static constexpr auto POLLING_PERIOD_MS = 10 * 1000;
+    static constexpr auto POLLING_PERIOD_MS = 1 * 1000;
 };
 
 } // namespace wi

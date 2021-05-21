@@ -6,20 +6,23 @@ namespace wi
 
 port_i2c::port_i2c(int id, unsigned int clock_speed_hz): id_(id)
 {
-    am_hal_iom_initialize(id, &i2c_handle_);
     am_hal_iom_config_t config = {
         .eInterfaceMode = AM_HAL_IOM_I2C_MODE,
         .ui32ClockFreq = clock_speed_hz,
     };
+
+    am_hal_iom_initialize(id_, &i2c_handle_);
+    am_hal_iom_power_ctrl(i2c_handle_, AM_HAL_SYSCTRL_WAKE, false);
     am_hal_iom_configure(i2c_handle_, &config);
     am_hal_iom_enable(i2c_handle_);
-    am_hal_iom_power_ctrl(i2c_handle_, AM_HAL_SYSCTRL_WAKE, false);
     i2c_mutex_ = xSemaphoreCreateMutex();
     i2c_semaphore_ = xSemaphoreCreateBinary();
 }
 
 port_i2c::~port_i2c()
 {
+    vSemaphoreDelete(i2c_mutex_);
+    vSemaphoreDelete(i2c_semaphore_);
     am_hal_iom_uninitialize(i2c_handle_);
 }
 

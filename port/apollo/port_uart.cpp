@@ -5,7 +5,7 @@
 namespace wi
 {
 
-port_uart::port_uart(int id, int baudrate): id_(id)
+port_uart::port_uart(int id, uint32_t baudrate): id_(id)
 {
     am_hal_uart_initialize(id_, &uart_handle_);
     am_hal_uart_power_control(uart_handle_, AM_HAL_SYSCTRL_WAKE, false);
@@ -20,10 +20,10 @@ port_uart::port_uart(int id, int baudrate): id_(id)
         .ui32FifoLevels = (AM_HAL_UART_TX_FIFO_1_2 |
                         AM_HAL_UART_RX_FIFO_1_2),
 
-        .pui8TxBuffer = tx_buffer_,
-        .ui32TxBufferSize = sizeof(tx_buffer_),
+        .pui8TxBuffer = nullptr,
+        .ui32TxBufferSize = 0,
         .pui8RxBuffer = nullptr,
-        .ui32RxBufferSize = NULL,
+        .ui32RxBufferSize = 0,
     };
     am_hal_uart_configure(uart_handle_, &uart_config);
 
@@ -43,7 +43,7 @@ bool port_uart::write(const uint8_t *p_data, size_t size, unsigned int timeout_m
         .ui32Direction = AM_HAL_UART_WRITE,
         .pui8Data = (uint8_t *) p_data,
         .ui32NumBytes = size,
-        .ui32TimeoutMs = timeout_ms,
+        .ui32TimeoutMs = AM_HAL_UART_WAIT_FOREVER,
         .pui32BytesTransferred = nullptr,
     };
 

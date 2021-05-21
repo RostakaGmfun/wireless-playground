@@ -62,7 +62,7 @@ extern "C"
 #define configTICK_RATE_HZ                      1000
 #define configMAX_PRIORITIES                    4
 #define configMINIMAL_STACK_SIZE                (256)
-#define configTOTAL_HEAP_SIZE                   (16 * 1024)
+#define configTOTAL_HEAP_SIZE                   (64 * 1024)
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -101,7 +101,8 @@ extern "C"
 #define NVIC_configMAX_SYSCALL_INTERRUPT_PRIORITY   (0x4)
 
 /* Define to trap errors during development. */
-#define configASSERT(x)     if (( x ) == 0) while(1);
+void vAssertFailedHook(const char *file, int line);
+#define configASSERT(x)     if (( x ) == 0) vAssertFailedHook(__FILE__, __LINE__)
 
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 0

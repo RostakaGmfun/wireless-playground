@@ -1,6 +1,7 @@
 #include "wi_logger.hpp"
 
 #include <ctime>
+#include <cstring>
 #include <sys/time.h>
 #include "printf.h"
 
@@ -8,7 +9,7 @@ namespace wi
 {
 
 logger::logger(size_t buffer_size, logger_output_t p_output):
-    buffer_(new char[buffer_size_]), buffer_size_(buffer_size),
+    buffer_(new char[buffer_size]), buffer_size_(buffer_size),
     buffer_mutex_(xSemaphoreCreateMutex()), output_(p_output),
     level_(logger_debug)
 {
@@ -94,11 +95,12 @@ void logger::write_impl(logger_level level, const char *format, va_list ap)
         return;
     }
     size_left -= written2;
-    if (size_left > 0) {
-        buffer_[written + written2] = '\n';
+    if (size_left > 1) {
+        buffer_[written + written2] = '\r';
+        buffer_[written + written2 + 1] = '\n';
     }
 
-    output_(buffer_, written + written2 + 1);
+    output_(buffer_, written + written2 + 2);
 
     return;
 }

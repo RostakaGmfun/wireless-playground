@@ -7,12 +7,12 @@ namespace wi
 
 logger *get_logger();
 
-#define WI_LOG_DEBUG_NOLOCK(msg, ...) get_logger()->write_nolock(logger_debug, msg, ##__VA_ARGS__)
-#define WI_LOG_DEBUG_INFO(msg, ...) get_logger()->write_nolock(logger_info, msg, ##__VA_ARGS__)
-#define WI_LOG_DEBUG_ERROR(msg, ...) get_logger()->write_nolock(logger_error, msg, ##__VA_ARGS__)
-
-#define WI_LOG_DEBUG(msg, ...) get_logger()->write_debug(msg, ##__VA_ARGS__)
-#define WI_LOG_INFO(msg, ...) get_logger()->write_info(msg, ##__VA_ARGS__)
-#define WI_LOG_ERROR(msg, ...) get_logger()->write_error(msg, ##__VA_ARGS__)
-
 } // namespace wi
+
+#define WI_LOG_DEBUG_NOLOCK(msg, ...) wi::get_logger()->write_nolock(wi::logger_debug, msg, ##__VA_ARGS__)
+#define WI_LOG_INFO_NOLOCK(msg, ...) wi::get_logger()->write_nolock(wi::logger_info, msg, ##__VA_ARGS__)
+#define WI_LOG_ERROR_NOLOCK(msg, ...) wi::get_logger()->write_nolock(wi::logger_error, msg, ##__VA_ARGS__)
+
+#define WI_LOG_DEBUG(msg, ...) wi::get_logger()->write_debug(msg, ##__VA_ARGS__)
+#define WI_LOG_INFO(msg, ...) wi::get_logger()->write_info(msg, ##__VA_ARGS__)
+#define WI_LOG_ERROR(msg, ...) wi::get_logger()->write_error(msg, ##__VA_ARGS__)

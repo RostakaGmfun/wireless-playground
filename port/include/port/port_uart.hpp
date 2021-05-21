@@ -9,7 +9,7 @@ namespace wi
 class port_uart
 {
 public:
-    port_uart(int id, int baudrate);
+    port_uart(int id, uint32_t baudrate);
     ~port_uart();
     port_uart(const port_uart &other) = delete;
     port_uart(port_uart &&other) = delete;
@@ -33,8 +33,6 @@ public:
 private:
     int id_;
     void *uart_handle_;
-    static constexpr auto TX_BUFFER_SIZE = 1024;
-    uint8_t tx_buffer_[TX_BUFFER_SIZE];
 };
 
 } // namespace wi

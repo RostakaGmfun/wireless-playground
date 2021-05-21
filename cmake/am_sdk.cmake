@@ -14,7 +14,6 @@ add_library(am_sdk_hal
   ${AM_SDK_HAL}/am_hal_secure_ota.c
   ${AM_SDK_HAL}/am_hal_mcuctrl.c
   ${AM_SDK_HAL}/am_hal_debug.c
-  ${AM_SDK_HAL}/am_hal_ble_patch.c
   ${AM_SDK_HAL}/am_hal_security.c
   ${AM_SDK_HAL}/am_hal_rtc.c
   ${AM_SDK_HAL}/am_hal_tpiu.c
@@ -82,10 +81,8 @@ set(AM_SDK_UTILS $ENV{AM_SDK_PATH}/utils)
 add_library(am_sdk_utils
   ${AM_SDK_UTILS}/am_util_delay.c
   ${AM_SDK_UTILS}/am_util_stdio.c
-  ${AM_SDK_UTILS}/am_util_faultisr.c
   ${AM_SDK_UTILS}/am_util_id.c
   ${AM_SDK_UTILS}/am_util_debug.c
-  ${AM_SDK_UTILS}/am_util_regdump.c
   ${AM_SDK_UTILS}/am_util_ble.c
   ${AM_SDK_UTILS}/am_util_string.c
   ${AM_SDK_UTILS}/am_util_time.c)
