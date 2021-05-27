@@ -3,6 +3,7 @@ project(wi C CXX)
 
 set(WI_TARGET_PLATFORM apollo)
 set(WI_RTOS_LIB am_sdk_freertos)
+set(WI_CORDIO_LIB am_sdk_cordio)
 
 # For global configs
 include_directories(include)
@@ -29,7 +30,8 @@ target_link_libraries(wi-fw
   ext_printf
   driver_sht3x
   wi_logger
-  ${WI_RTOS_LIB})
+  ${WI_RTOS_LIB}
+  ${WI_CORDIO_LIB})
 
 target_link_options(wi-fw PRIVATE
   "LINKER:-gc-sections"
