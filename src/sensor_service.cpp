@@ -3,6 +3,7 @@
 #include "task.h"
 
 #include "drivers/sht3x.hpp"
+#include "drivers/apds9960.hpp"
 #include "bsp/wi_bsp.hpp"
 #include "port/port_gpio.hpp"
 #include "wi.hpp"
@@ -16,7 +17,7 @@ sensor_service::sensor_service()
         sensor_service *p_this = static_cast<sensor_service *>(ctx);
         p_this->task_entry();
     };
-    measurement_ready_sem_ = xSemaphoreCreateCounting(1, 0);
+    measurement_ready_sem_ = xSemaphoreCreateCounting(MEASUREMENTS_COUNT, 0);
 
     xTaskCreate(entry_fn, "sensor_service", STACK_SIZE, this, PRIORITY, &task_handle_);
     wi::bsp_gpio_get().set(5, true);
@@ -29,26 +30,46 @@ sensor_service::~sensor_service()
 
 void sensor_service::task_entry()
 {
-    bool flag = false;
     while (1) {
-        WI_LOG_INFO("SENSOR_DATA");
-        bsp_gpio_get().set(5, flag);
-        flag = !flag;
-        /*
-        driver_sht3x &p_sht = bsp_sht3x_get();
-        p_sht.trigger_measurement(sht3x_repeatability_medium, [] (void *ctx) {
+#if 0
+        driver_sht3x &sht = bsp_sht3x_get();
+        sht.trigger_measurement(sht3x_repeatability_medium, [] (void *ctx) {
                     sensor_service *p_this = static_cast<sensor_service *>(ctx);
                     xSemaphoreGive(p_this->measurement_ready_sem_);
                 }, this);
-        xSemaphoreTake(measurement_ready_sem_, portMAX_DELAY);
+
+        driver_apds9960 &als = bsp_apds9960_get();
+        als.trigger_measurement([] (void *ctx) {
+                    sensor_service *p_this = static_cast<sensor_service *>(ctx);
+                    xSemaphoreGive(p_this->measurement_ready_sem_);
+                }, this);
+
+        int vbatt_mv = 0;
+        int vsolar_mv = 0;
+        int chip_temp = 0;
+        bsp_measure_vbatt(&vbatt_mv);
+        bsp_measure_vsolar(&vsolar_mv);
+        bsp_measure_chip_temp(&chip_temp);
+
+        for (int i = 0; i < MEASUREMENTS_COUNT; i++) {
+            xSemaphoreTake(measurement_ready_sem_, portMAX_DELAY);
+        }
+
         int temp = 0;
         int rh = 0;
-        if (p_sht.read_data(&temp, &rh)) {
-            WI_LOG_INFO("SENSOR_DATA %d %d", temp, rh);
-        } else {
-            WI_LOG_ERROR("SENSOR_DATA read failed");
+        if (!sht.read_data(&temp, &rh)) {
+            WI_LOG_ERROR("SENSOR_DATA SHT3x read failed");
         }
-        */
+
+        int als_r = 0;
+        int als_g = 0;
+        int als_b = 0;
+        if (!als.read_data(&als_r, &als_g, &als_b)) {
+            WI_LOG_ERROR("SENSOR_DATA APDS9960 read failed");
+        }
+
+        WI_LOG_INFO("SENSOR_DATA %d %d %d %d %d %d %d %d", temp, rh, als_r, als_g, als_b, vbatt_mv, vsolar_mv, chip_temp);
+#endif
         vTaskDelay(pdMS_TO_TICKS(POLLING_PERIOD_MS));
     }
 }
