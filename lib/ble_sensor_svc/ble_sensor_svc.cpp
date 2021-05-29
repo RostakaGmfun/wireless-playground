@@ -131,9 +131,17 @@ private:
     };
 };
 
+static ble_sensor_listener *svc_instance_;
+
 ble_sensor_listener *ble_sensor_svc_init(uint32_t handler_id)
 {
-    return new ble_sensor_svc(handler_id);
+    svc_instance_ = new ble_sensor_svc(handler_id);
+    return svc_instance_;
+}
+
+ble_sensor_listener *ble_sensor_svc_get()
+{
+    return svc_instance_;
 }
 
 } // namespace wi

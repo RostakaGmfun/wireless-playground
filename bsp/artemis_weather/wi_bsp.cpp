@@ -6,6 +6,22 @@
 
 #include "am_mcu_apollo.h"
 
+extern "C" void am_ctimer_isr(void)
+{
+    uint32_t ui32Status;
+
+    //
+    // Check the timer interrupt status.
+    //
+    ui32Status = am_hal_ctimer_int_status_get(false);
+    am_hal_ctimer_int_clear(ui32Status);
+
+    //
+    // Run handlers for the various possible timer events.
+    //
+    am_hal_ctimer_int_service(ui32Status);
+}
+
 namespace wi
 {
 
@@ -59,7 +75,7 @@ void bsp_init()
 
     i2c_sensor_bus_ = new port_i2c(4);
     console_uart_ = new port_uart(0, 115200);
-    //sht3x_ = new driver_sht3x(0x44, *i2c_sensor_bus_);
+    sht3x_ = new driver_sht3x(0x44, *i2c_sensor_bus_);
 }
 
 driver_sht3x &bsp_sht3x_get()

@@ -2,6 +2,13 @@
 #include "task.h"
 #include "wi.hpp"
 
+static void print_stack(uint32_t *ptr)
+{
+    for (int i = 0; i < 128; i++) {
+        WI_LOG_ERROR_NOLOCK("%08x", ptr[i]);
+    }
+}
+
 extern "C" uint32_t wi_freertos_sleep(uint32_t idleTime)
 {
     return 0;
@@ -27,7 +34,10 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskN
 
 extern "C" void vAssertFailedHook(const char *file, int line)
 {
+    vTaskSuspendAll();
     WI_LOG_ERROR_NOLOCK("Assert failed %s %d", file, line);
+    uint32_t dummy = 0;
+    print_stack(&dummy);
     while (1);
 }
 
@@ -54,6 +64,7 @@ extern "C" void vPrintCrashDump(uint32_t *pulFaultStackAddress)
 
     WI_LOG_ERROR_NOLOCK("Crash: r0 %08x r1 %08x r2 %08x r3 %08x r12 %08x lr %08x pc %08x pssr %08x",
             r0, r1, r2, r3, r12, lr, pc, psr);
+    print_stack(pulFaultStackAddress);
 }
 
 

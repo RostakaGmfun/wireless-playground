@@ -84,7 +84,7 @@ void logger::write_impl(logger_level level, const char *format, va_list ap)
 
     // FORMAT: LVL YYYY MM DD hh mm ss uuu MSG\n
     const int written = snprintf(buffer_, size_left, "%s %04d %02d %02d %02d %02d %02d %03d ",
-            level_str[level], tm_val.tm_year, tm_val.tm_mon, tm_val.tm_mday, tm_val.tm_hour,
+            level_str[level], 1900 + tm_val.tm_year, 1 + tm_val.tm_mon, tm_val.tm_mday, tm_val.tm_hour,
             tm_val.tm_min, tm_val.tm_sec, (current_time.tv_usec / 1000) % 1000);
     if (written < 0 || written == size_left) {
         return;

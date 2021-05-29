@@ -3,6 +3,7 @@ set(AM_SDK_HAL $ENV{AM_SDK_PATH}/mcu/apollo3/hal)
 add_library(am_sdk_hal
   ${AM_SDK_HAL}/am_hal_iom.c
   ${AM_SDK_HAL}/am_hal_uart.c
+  ${AM_SDK_HAL}/am_hal_ble_patch.c
   ${AM_SDK_HAL}/am_hal_ble_patch_b0.c
   ${AM_SDK_HAL}/am_hal_cmdq.c
   ${AM_SDK_HAL}/am_hal_gpio.c
@@ -196,10 +197,23 @@ add_library(am_sdk_cordio
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_main.c
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_aes.c
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_ecc_hci.c
+  ${AM_SDK_CORDIO}/ble-host/sources/sec/uecc/sec_ecc.c
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_ccm_hci.c
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_aes_rev.c
   ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_cmac_hci.c
-  ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_ecc_debug.c)
+  ${AM_SDK_CORDIO}/ble-host/sources/sec/common/sec_ecc_debug.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/profiles/gatt/gatt_main.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_slave.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/common/app_db.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_main.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/common/app_ui.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/services/svc_core.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/services/svc_dis.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_server.c
+  ${AM_SDK_CORDIO}/ble-host/sources/hci/ambiq/apollo3/hci_drv_apollo3.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_slave_leg.c
+  ${AM_SDK_CORDIO}/../uecc/uECC.c
+  ${AM_SDK_CORDIO}/../uecc/uECC_ll.c)
 
 target_include_directories(am_sdk_cordio PUBLIC
   ${AM_SDK_CORDIO}/ble-host/include
@@ -209,12 +223,17 @@ target_include_directories(am_sdk_cordio PUBLIC
   ${AM_SDK_CORDIO}/wsf/sources
   ${AM_SDK_CORDIO}/wsf/sources/util
   ${AM_SDK_CORDIO}/ble-host/sources/hci/ambiq
+  ${AM_SDK_CORDIO}/ble-host/sources/hci/ambiq/apollo3
   ${AM_SDK_CORDIO}/ble-host/sources/stack/cfg
   ${AM_SDK_CORDIO}/ble-host/sources/stack/hci
   ${AM_SDK_CORDIO}/ble-host/sources/stack/smp
   ${AM_SDK_CORDIO}/ble-profiles/sources/services
   ${AM_SDK_CORDIO}/ble-host/sources/stack/dm
-  ${AM_SDK_CORDIO}/ble-host/sources/sec/common)
+  ${AM_SDK_CORDIO}/ble-host/sources/sec/common
+  ${AM_SDK_CORDIO}/ble-profiles/include/app
+  ${AM_SDK_CORDIO}/ble-profiles/sources/profiles
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app
+  ${AM_SDK_CORDIO}/../uecc)
 
 target_compile_definitions(am_sdk_cordio PUBLIC
   SEC_ECC_CFG=SEC_ECC_CFG_UECC

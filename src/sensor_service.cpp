@@ -3,7 +3,7 @@
 #include "task.h"
 
 #include "drivers/sht3x.hpp"
-#include "drivers/apds9960.hpp"
+//#include "drivers/apds9960.hpp"
 #include "bsp/wi_bsp.hpp"
 #include "port/port_gpio.hpp"
 #include "wi.hpp"
@@ -20,7 +20,6 @@ sensor_service::sensor_service()
     measurement_ready_sem_ = xSemaphoreCreateCounting(MEASUREMENTS_COUNT, 0);
 
     xTaskCreate(entry_fn, "sensor_service", STACK_SIZE, this, PRIORITY, &task_handle_);
-    wi::bsp_gpio_get().set(5, true);
 }
 
 sensor_service::~sensor_service()
