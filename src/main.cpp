@@ -38,7 +38,7 @@ static void ble_task_entry(void *pvParams)
     HciDrvRadioBoot(1);
     wi::ble_stack_init();
     wi::ble_stack_start();
-    wi::sensor_service *sensor_srv = new wi::sensor_service;
+    wi::sensor_service *sensor_srv = new wi::sensor_service();
 
     while (1) {
         wi::ble_stack_process_events();

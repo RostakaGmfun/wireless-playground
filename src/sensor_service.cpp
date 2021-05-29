@@ -7,6 +7,7 @@
 #include "bsp/wi_bsp.hpp"
 #include "port/port_gpio.hpp"
 #include "wi.hpp"
+#include "ble_sensor_svc.hpp"
 
 namespace wi
 {
@@ -70,6 +71,10 @@ void sensor_service::task_entry()
         WI_LOG_INFO("TEMP %d %d", temp, rh);
         WI_LOG_INFO("ALS %d %d %d %d", als_r, als_g, als_b, als_c);
         WI_LOG_INFO("POWER %d %d %d", vbatt_mv, vsolar_mv, chip_temp);
+        ble_sensor_listener *ble_svc = ble_sensor_svc_get();
+        ble_svc->update_temperature(temp);
+        ble_svc->update_humidity(rh);
+        ble_svc->update_als(als_r, als_g, als_b, als_c);
         vTaskDelay(pdMS_TO_TICKS(POLLING_PERIOD_MS));
     }
 }
