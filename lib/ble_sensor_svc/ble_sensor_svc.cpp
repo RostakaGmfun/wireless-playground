@@ -3,36 +3,36 @@
 #include "att_api.h"
 #include "util/bstream.h"
 
-#define TEMP_HANDLE_START  0x60                          /*!< \brief Start handle. */
-#define TEMP_HANDLE_END   (TEMP_HANDLE_END_PLUS_ONE - 1) /*!< \brief End handle. */
+#define SENSOR_HANDLE_START  0x60                          /*!< \brief Start handle. */
+#define SENSOR_HANDLE_END   (SENSOR_HANDLE_END_PLUS_ONE - 1) /*!< \brief End handle. */
 
-#define TEMP_UUID_SVC           0x3010
+#define SENSOR_UUID_SVC         0x3010
 #define TEMP_UUID_CHR_DATA      0x3011
+#define HUMIDITY_UUID_CHR_DATA  0x3012
+#define ALS_UUID_CHR_DATA       0x3013
 
 namespace wi
 {
 
 enum
 {
-  TEMP_HANDLE_SVC = TEMP_HANDLE_START, /*!< \brief Service declaration. */
+  SENSOR_HANDLE_SVC = SENSOR_HANDLE_START, /*!< \brief Service declaration. */
 
-  TEMP_HANDLE_DATA_CHR,                /*!< \brief Data characteristic declaration. */
-  TEMP_HANDLE_DATA,                    /*!< \brief Data characteristic value. */
-  TEMP_HANDLE_DATA_CLIENT_CHR_CONFIG,  /*!< \brief Data characteristic CCCD. */
-  TEMP_HANDLE_DATA_CHR_USR_DESCR,      /*!< \brief Data characteristic user description. */
+  SENSOR_HANDLE_TEMP,                    /*!< \brief Temperature value. */
+  SENSOR_HANDLE_HUMIDITY,                 /*!< \brief Humidity value. */
+  SENSOR_HANDLE_ALS,                     /*!< \brief ALS value. */
 
-  TEMP_HANDLE_END_PLUS_ONE             /*!< \brief Maximum handle. */
+  SENSOR_HANDLE_END_PLUS_ONE             /*!< \brief Maximum handle. */
 };
 
 
-/* Temperature service declaration. */
-static const uint8_t  tempValSvc[] = {UINT16_TO_BYTES(TEMP_UUID_SVC)};
-static const uint16_t tempLenSvc   = sizeof(tempValSvc);
+/* Sensor service declaration. */
+static const uint8_t  sensorValSvc[] = {UINT16_TO_BYTES(SENSOR_UUID_SVC)};
+static const uint16_t sensorLenSvc   = sizeof(sensorValSvc);
 
 /* Temperature data characteristic. */
-static const uint8_t  tempValDataChr[] = {ATT_PROP_READ | ATT_PROP_NOTIFY,
-                                          UINT16_TO_BYTES(TEMP_HANDLE_DATA),
-                                          UINT16_TO_BYTES(TEMP_UUID_CHR_DATA)};
+static const uint8_t  tempValDataChr[] = {ATT_PROP_READ,
+                                          UINT16_TO_BYTES(SENSOR_HANDLE_TEMP)};
 static const uint16_t tempLenDataChr   = sizeof(tempValDataChr);
 
 /* Temperature data. */
@@ -40,13 +40,25 @@ static const uint8_t  tempUuidData[] = {UINT16_TO_BYTES(TEMP_UUID_CHR_DATA)};
 static       uint8_t  tempValData[]  = {0x00, 0x00};
 static const uint16_t tempLenData    = sizeof(tempValData);
 
-/* Temperature data client characteristic configuration. */
-static       uint8_t  tempValDataClientChrConfig[] = {0x00, 0x00};
-static const uint16_t tempLenDataClientChrConfig   = sizeof(tempValDataClientChrConfig);
+/* Humidity data characteristic. */
+static const uint8_t  humidityValDataChr[] = {ATT_PROP_READ,
+                                          UINT16_TO_BYTES(SENSOR_HANDLE_HUMIDITY)};
+static const uint16_t humidityLenDataChr   = sizeof(humidityValDataChr);
 
-/* Temperature data characteristic user description. */
-static const uint8_t  tempValDataChrUsrDescr[] = "Temp Data";
-static const uint16_t tempLenDataChrUsrDescr   = sizeof(tempValDataChrUsrDescr) - 1u;
+/* Humidity data. */
+static const uint8_t  humidityUuidData[] = {UINT16_TO_BYTES(HUMIDITY_UUID_CHR_DATA)};
+static       uint8_t  humidityValData[]  = {0x00, 0x00};
+static const uint16_t humidityLenData    = sizeof(humidityValData);
+
+/* ALS data characteristic. */
+static const uint8_t  alsValDataChr[] = {ATT_PROP_READ,
+                                          UINT16_TO_BYTES(SENSOR_HANDLE_ALS)};
+static const uint16_t alsLenDataChr   = sizeof(alsValDataChr);
+
+/* ALS data. */
+static const uint8_t  alsUuidData[] = {UINT16_TO_BYTES(ALS_UUID_CHR_DATA)};
+static       uint8_t  alsValData[4 * sizeof(uint16_t)]  = {0x00};
+static const uint16_t alsLenData    = sizeof(alsValData);
 
 /* Attribute list for temp group. */
 static const attsAttr_t tempList[] =
@@ -54,13 +66,13 @@ static const attsAttr_t tempList[] =
   /* Service declaration. */
   {
     attPrimSvcUuid,
-    (uint8_t *) tempValSvc,
-    (uint16_t *) &tempLenSvc,
-    sizeof(tempValSvc),
+    (uint8_t *) sensorValSvc,
+    (uint16_t *) &sensorLenSvc,
+    sizeof(sensorValSvc),
     0,
     ATTS_PERMIT_READ
   },
-  /* Characteristic declaration. */
+  /* Temperature Characteristic declaration. */
   {
     attChUuid,
     (uint8_t *) tempValDataChr,
@@ -69,7 +81,7 @@ static const attsAttr_t tempList[] =
     0,
     ATTS_PERMIT_READ
   },
-  /* Characteristic value. */
+  /* Temperature Characteristic value. */
   {
     tempUuidData,
     (uint8_t *) tempValData,
@@ -78,21 +90,39 @@ static const attsAttr_t tempList[] =
     0,
     ATTS_PERMIT_READ
   },
-  /* Client characteristic configuration. */
+  /* Humidity characteristic declaration. */
   {
-    attCliChCfgUuid,
-    (uint8_t *) tempValDataClientChrConfig,
-    (uint16_t *) &tempLenDataClientChrConfig,
-    sizeof(tempValDataClientChrConfig),
-    ATTS_SET_CCC,
-    ATTS_PERMIT_READ | ATTS_PERMIT_WRITE
+    attChUuid,
+    (uint8_t *) humidityValDataChr,
+    (uint16_t *) &humidityLenDataChr,
+    sizeof(humidityValDataChr),
+    0,
+    ATTS_PERMIT_READ
   },
-  /* Characteristic user description. */
+  /* Humidity characteristic value. */
   {
-    attChUserDescUuid,
-    (uint8_t *) tempValDataChrUsrDescr,
-    (uint16_t *) &tempLenDataChrUsrDescr,
-    sizeof(tempValDataChrUsrDescr) - 1,
+    humidityUuidData,
+    (uint8_t *) humidityValData,
+    (uint16_t *) &humidityLenData,
+    sizeof(humidityValData),
+    0,
+    ATTS_PERMIT_READ
+  },
+  /* ALS Characteristic declaration. */
+  {
+    attChUuid,
+    (uint8_t *) alsValDataChr,
+    (uint16_t *) &alsLenDataChr,
+    sizeof(alsValDataChr),
+    0,
+    ATTS_PERMIT_READ
+  },
+  /* ALS Characteristic value. */
+  {
+    alsUuidData,
+    (uint8_t *) alsValData,
+    (uint16_t *) &alsLenData,
+    sizeof(alsValData),
     0,
     ATTS_PERMIT_READ
   },
@@ -108,13 +138,28 @@ public:
 
     ~ble_sensor_svc()
     {
-        AttsRemoveGroup(TEMP_HANDLE_START);
+        AttsRemoveGroup(SENSOR_HANDLE_START);
     }
 
     void update_temperature(int temp_celsium) override
     {
         uint8_t tempData[2] = {UINT16_TO_BYTES((uint16_t)temp_celsium)};
-        AttsSetAttr(TEMP_HANDLE_DATA, sizeof(tempData), tempData);
+        AttsSetAttr(SENSOR_HANDLE_TEMP, sizeof(tempData), tempData);
+    }
+
+    void update_humidity(int rh) override
+    {
+        uint8_t humidityData[2] = {UINT16_TO_BYTES((uint16_t)rh)};
+        AttsSetAttr(SENSOR_HANDLE_HUMIDITY, sizeof(humidityData), humidityData);
+    }
+
+    void update_als(uint16_t r, uint16_t g, uint16_t b, uint16_t c) override
+    {
+        uint8_t alsData[4 * sizeof(uint16_t)] = {UINT16_TO_BYTES(r),
+                                                 UINT16_TO_BYTES(g),
+                                                 UINT16_TO_BYTES(b),
+                                                 UINT16_TO_BYTES(c)};
+        AttsSetAttr(SENSOR_HANDLE_HUMIDITY, sizeof(alsData), alsData);
     }
 
 private:
@@ -126,8 +171,8 @@ private:
         (attsAttr_t *) tempList,
         NULL,
         NULL,
-        TEMP_HANDLE_START,
-        TEMP_HANDLE_END
+        SENSOR_HANDLE_START,
+        SENSOR_HANDLE_END
     };
 };
 
