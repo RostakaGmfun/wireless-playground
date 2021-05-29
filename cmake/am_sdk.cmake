@@ -212,6 +212,7 @@ add_library(am_sdk_cordio
   ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_server.c
   ${AM_SDK_CORDIO}/ble-host/sources/hci/ambiq/apollo3/hci_drv_apollo3.c
   ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_slave_leg.c
+  ${AM_SDK_CORDIO}/ble-profiles/sources/apps/app/app_disc.c
   ${AM_SDK_CORDIO}/../uecc/uECC.c
   ${AM_SDK_CORDIO}/../uecc/uECC_ll.c)
 

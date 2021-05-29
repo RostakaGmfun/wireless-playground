@@ -22,30 +22,26 @@ class driver_sht3x
 public:
     driver_sht3x(uint8_t addr, port_i2c &i2c_bus):
         addr_(addr), i2c_bus_(i2c_bus), ready_timer_(nullptr), cache_valid_(false)
-    {}
+    {
+        ready_timer_ = xTimerCreate("sht3x",
+                pdMS_TO_TICKS(default_timer_period_ms),
+                pdFALSE,
+                (void *)this, [] (TimerHandle_t timer) {
+                    driver_sht3x *p_this = (driver_sht3x *)pvTimerGetTimerID(timer);
+                    p_this->ready_callback_(p_this->ready_callback_ctx_);
+                });
+        vTimerSetTimerID(ready_timer_, (void *)this);
+    }
 
     ~driver_sht3x()
     {
-        if (nullptr != ready_timer_) {
-            xTimerDelete(ready_timer_, portMAX_DELAY);
-        }
+        xTimerDelete(ready_timer_, portMAX_DELAY);
     }
 
     bool trigger_measurement(sht3x_repeatability_t repeatability, void (*ready_cb)(void *), void *ready_cb_ctx)
     {
         ready_callback_ = ready_cb;
         ready_callback_ctx_ = ready_cb_ctx;
-        if (nullptr == ready_timer_) {
-            ready_timer_ = xTimerCreate("sht3x",
-                    pdMS_TO_TICKS(default_timer_period_ms),
-                    pdFALSE,
-                    (void *)this, [] (TimerHandle_t timer) {
-                        driver_sht3x *p_this = (driver_sht3x *)pvTimerGetTimerID(timer);
-                        p_this->ready_callback_(p_this->ready_callback_ctx_);
-                    });
-        } else {
-            vTimerSetTimerID(ready_timer_, (void *)this);
-        }
 
         if (!i2c_bus_.lock(i2c_lock_timeout_ms)) {
             return false;

@@ -3,6 +3,7 @@
 #include "port/port_uart.hpp"
 #include "port/port_gpio.hpp"
 #include "drivers/sht3x.hpp"
+#include "drivers/apds9960.hpp"
 
 #include "am_mcu_apollo.h"
 
@@ -26,6 +27,7 @@ namespace wi
 {
 
 static driver_sht3x *sht3x_;
+static driver_apds9960 *apds9960_;
 static port_i2c *i2c_sensor_bus_;
 static port_uart *console_uart_;
 static port_gpio *gpio_;
@@ -76,11 +78,17 @@ void bsp_init()
     i2c_sensor_bus_ = new port_i2c(4);
     console_uart_ = new port_uart(0, 115200);
     sht3x_ = new driver_sht3x(0x44, *i2c_sensor_bus_);
+    apds9960_ = new driver_apds9960(0x39, *i2c_sensor_bus_);
 }
 
 driver_sht3x &bsp_sht3x_get()
 {
     return *sht3x_;
+}
+
+driver_apds9960 &bsp_apds9960_get()
+{
+    return *apds9960_;
 }
 
 port_uart &bsp_console_uart_get()
@@ -91,6 +99,21 @@ port_uart &bsp_console_uart_get()
 port_gpio &bsp_gpio_get()
 {
     return *gpio_;
+}
+
+void bsp_measure_vbatt(int *p_vbatt_mv)
+{
+
+}
+
+void bsp_measure_vsolar(int *p_vsolar_mv)
+{
+
+}
+
+void bsp_measure_chip_temp(int *p_chip_temp)
+{
+
 }
 
 } // namespace wi

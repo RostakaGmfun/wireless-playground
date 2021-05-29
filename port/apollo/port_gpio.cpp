@@ -43,7 +43,7 @@ void port_gpio::set(int pin_id, bool value)
 
 bool port_gpio::get(int pin_id)
 {
-
+    return false;
 }
 
 bool port_gpio::lock(unsigned int timeout_ms)

@@ -30,6 +30,7 @@ target_link_libraries(wi-fw
   tflite_micro
   ext_printf
   driver_sht3x
+  driver_apds9960
   wi_logger
   ble_sensor_svc
   ${WI_RTOS_LIB}
