@@ -18,8 +18,11 @@ enum
 {
   SENSOR_HANDLE_SVC = SENSOR_HANDLE_START, /*!< \brief Service declaration. */
 
+  SENSOR_HANDLE_TEMP_CHR,                    /*!< \brief Temperature value characteristic. */
   SENSOR_HANDLE_TEMP,                    /*!< \brief Temperature value. */
-  SENSOR_HANDLE_HUMIDITY,                 /*!< \brief Humidity value. */
+  SENSOR_HANDLE_HUMIDITY_CHR,            /*!< \brief Humidity value characteristic. */
+  SENSOR_HANDLE_HUMIDITY,                /*!< \brief Humidity value. */
+  SENSOR_HANDLE_ALS_CHR,                 /*!< \brief ALS value characteristic. */
   SENSOR_HANDLE_ALS,                     /*!< \brief ALS value. */
 
   SENSOR_HANDLE_END_PLUS_ONE             /*!< \brief Maximum handle. */
