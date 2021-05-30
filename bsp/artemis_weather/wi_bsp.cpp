@@ -77,7 +77,7 @@ void bsp_init()
 
     i2c_sensor_bus_ = new port_i2c(4);
     console_uart_ = new port_uart(0, 115200);
-    sht3x_ = new driver_sht3x(0x44, *i2c_sensor_bus_);
+    sht3x_ = new driver_sht3x(0x45, *i2c_sensor_bus_);
     apds9960_ = new driver_apds9960(0x39, *i2c_sensor_bus_);
 }
 
@@ -119,7 +119,8 @@ void bsp_measure_chip_temp(int *p_chip_temp)
 bool bsp_probe_i2c(uint8_t addr)
 {
     i2c_sensor_bus_->configure(100000);
-    return i2c_sensor_bus_->write(addr, nullptr, 0, 1000);
+    uint8_t data = 0;
+    return i2c_sensor_bus_->write(addr, &data, sizeof(data), 1000);
 }
 
 } // namespace wi

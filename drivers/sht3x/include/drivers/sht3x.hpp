@@ -95,9 +95,10 @@ public:
 
         i2c_bus_.configure(i2c_bus_speed_hz);
 
-        uint16_t data[2];
+        // two 16-bit results and 1-byte checksum after each measurement
+        uint8_t data[6];
 
-        const bool ret = i2c_bus_.read(addr_, (uint8_t *)data, sizeof(data), i2c_lock_timeout_ms);
+        const bool ret = i2c_bus_.read(addr_, data, sizeof(data), i2c_lock_timeout_ms);
 
         i2c_bus_.unlock();
 
@@ -105,8 +106,11 @@ public:
             return ret;
         }
 
-        temp_cache_ = -45 + (175LU * data[0]) / 0xFFFF;
-        rh_cache_ = (100LU * data[0]) / 0xFFFF;
+        const uint16_t temp_raw = (data[0] << 8) | data[1];
+        const uint16_t rh_raw = (data[3] << 8) | data[4];
+
+        temp_cache_ = -45 + (175LU * temp_raw) / 0xFFFF;
+        rh_cache_ = (100LU * rh_raw) / 0xFFFF;
         cache_valid_ = true;
 
         if (nullptr != p_temp_out) {

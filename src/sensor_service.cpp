@@ -30,8 +30,7 @@ sensor_service::~sensor_service()
 
 void sensor_service::task_entry()
 {
-    for (int addr = 0; addr < 256; addr++) {
-        WI_LOG_INFO("Check addr %02x", addr);
+    for (int addr = 0; addr < 128; addr++) {
         if (bsp_probe_i2c(addr)) {
             WI_LOG_INFO("Found I2C slave on %02x", addr);
         }
@@ -41,7 +40,6 @@ void sensor_service::task_entry()
         driver_sht3x &sht = bsp_sht3x_get();
         bool ret = sht.trigger_measurement(sht3x_repeatability_medium, [] (void *ctx) {
                     sensor_service *p_this = static_cast<sensor_service *>(ctx);
-                    WI_LOG_INFO("sht3x ready");
                     xSemaphoreGive(p_this->measurement_ready_sem_);
                 }, this);
         if (!ret) {
