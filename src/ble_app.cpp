@@ -71,10 +71,11 @@ static const char sensorScanDataLocalName[] =
 };
 
 /*! configurable parameters for slave */
+// Advertise all the time once per 5 seconds
 static const appAdvCfg_t sensorAdvCfg =
 {
-  {30000, 0, 0},         /*! Advertising durations in ms */
-  {200,                    0, 0},         /*! Advertising intervals in 0.625 ms units */
+  {0, 0, 0},         /*! Advertising durations in ms */
+  {8000, 0, 0},         /*! Advertising intervals in 0.625 ms units */
 };
 
 /*! configurable parameters for slave */

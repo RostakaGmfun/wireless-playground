@@ -162,7 +162,7 @@ public:
                                                  UINT16_TO_BYTES(g),
                                                  UINT16_TO_BYTES(b),
                                                  UINT16_TO_BYTES(c)};
-        AttsSetAttr(SENSOR_HANDLE_HUMIDITY, sizeof(alsData), alsData);
+        AttsSetAttr(SENSOR_HANDLE_ALS, sizeof(alsData), alsData);
     }
 
 private:
