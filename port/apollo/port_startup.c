@@ -55,9 +55,9 @@
 extern void Reset_Handler(void)       __attribute ((naked));
 extern void NMI_Handler(void)         __attribute ((weak));
 extern void HardFault_Handler(void)   __attribute ((weak));
-extern void MemManage_Handler(void)   __attribute ((weak, alias ("HardFault_Handler")));
-extern void BusFault_Handler(void)    __attribute ((weak, alias ("HardFault_Handler")));
-extern void UsageFault_Handler(void)  __attribute ((weak, alias ("HardFault_Handler")));
+extern void MemManage_Handler(void)   __attribute ((weak));
+extern void BusFault_Handler(void)    __attribute ((weak));
+extern void UsageFault_Handler(void)  __attribute ((weak));
 extern void SecureFault_Handler(void) __attribute ((weak));
 extern void SVC_Handler(void)         __attribute ((weak, alias ("am_default_isr")));
 extern void DebugMon_Handler(void)    __attribute ((weak, alias ("am_default_isr")));
@@ -332,10 +332,10 @@ NMI_Handler(void)
 // for examination by a debugger.
 //
 //*****************************************************************************
-extern void vPrintCrashDump(uint32_t *pulFaultStackAddress);
- __attribute__((used)) void crash_dump(uint32_t *pulFaultStackAddress)
+extern void vPrintCrashDump(uint32_t *pulFaultStackAddress, int type);
+__attribute__((used)) void crash_dump(uint32_t *pulFaultStackAddress, int type)
 {
-    vPrintCrashDump(pulFaultStackAddress);
+    vPrintCrashDump(pulFaultStackAddress, type);
     while (1);
 }
 
@@ -350,8 +350,52 @@ __attribute__((used)) void HardFault_Handler(void)
         " mrsne %0, psp                                             \n"
         : "=r"(stack_ptr)
     );
-    crash_dump(stack_ptr);
+    crash_dump(stack_ptr, 0);
 }
+
+__attribute__((used)) void MemManage_Handler(void)
+{
+    uint32_t *stack_ptr;
+    __asm volatile
+    (
+        " tst lr, #4                                                \n"
+        " ite eq                                                    \n"
+        " mrseq %0, msp                                             \n"
+        " mrsne %0, psp                                             \n"
+        : "=r"(stack_ptr)
+    );
+    crash_dump(stack_ptr, 1);
+}
+
+__attribute__((used)) void UsageFault_Handler(void)
+{
+    uint32_t *stack_ptr;
+    __asm volatile
+    (
+        " tst lr, #4                                                \n"
+        " ite eq                                                    \n"
+        " mrseq %0, msp                                             \n"
+        " mrsne %0, psp                                             \n"
+        : "=r"(stack_ptr)
+    );
+    crash_dump(stack_ptr, 2);
+}
+
+__attribute__((used)) void BusFault_Handler(void)
+{
+    uint32_t *stack_ptr;
+    __asm volatile
+    (
+        " tst lr, #4                                                \n"
+        " ite eq                                                    \n"
+        " mrseq %0, msp                                             \n"
+        " mrsne %0, psp                                             \n"
+        : "=r"(stack_ptr)
+    );
+    crash_dump(stack_ptr, 3);
+}
+
+
 
 //*****************************************************************************
 //

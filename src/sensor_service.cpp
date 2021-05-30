@@ -30,18 +30,33 @@ sensor_service::~sensor_service()
 
 void sensor_service::task_entry()
 {
+    for (int addr = 0; addr < 256; addr++) {
+        WI_LOG_INFO("Check addr %02x", addr);
+        if (bsp_probe_i2c(addr)) {
+            WI_LOG_INFO("Found I2C slave on %02x", addr);
+        }
+    }
     while (1) {
+        int measurements_count = MEASUREMENTS_COUNT;
         driver_sht3x &sht = bsp_sht3x_get();
-        sht.trigger_measurement(sht3x_repeatability_medium, [] (void *ctx) {
+        bool ret = sht.trigger_measurement(sht3x_repeatability_medium, [] (void *ctx) {
                     sensor_service *p_this = static_cast<sensor_service *>(ctx);
+                    WI_LOG_INFO("sht3x ready");
                     xSemaphoreGive(p_this->measurement_ready_sem_);
                 }, this);
+        if (!ret) {
+            measurements_count--;
+        }
 
         driver_apds9960 &als = bsp_apds9960_get();
-        als.trigger_measurement(2, [] (void *ctx) {
+        ret = als.trigger_measurement(2, [] (void *ctx) {
                     sensor_service *p_this = static_cast<sensor_service *>(ctx);
+                    WI_LOG_INFO("apds9960 ready");
                     xSemaphoreGive(p_this->measurement_ready_sem_);
                 }, this);
+        if (!ret) {
+            measurements_count--;
+        }
 
         int vbatt_mv = 0;
         int vsolar_mv = 0;
@@ -50,8 +65,10 @@ void sensor_service::task_entry()
         bsp_measure_vsolar(&vsolar_mv);
         bsp_measure_chip_temp(&chip_temp);
 
-        for (int i = 0; i < MEASUREMENTS_COUNT; i++) {
-            xSemaphoreTake(measurement_ready_sem_, portMAX_DELAY);
+        for (int i = 0; i < measurements_count; i++) {
+            if (pdTRUE != xSemaphoreTake(measurement_ready_sem_, pdMS_TO_TICKS(1000))) {
+                WI_LOG_ERROR("Sensor timeout");
+            }
         }
 
         int temp = 0;

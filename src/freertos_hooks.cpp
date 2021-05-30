@@ -1,6 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "wi.hpp"
+#include "apollo3.h"
 
 static void print_stack(uint32_t *ptr)
 {
@@ -41,7 +42,7 @@ extern "C" void vAssertFailedHook(const char *file, int line)
     while (1);
 }
 
-extern "C" void vPrintCrashDump(uint32_t *pulFaultStackAddress)
+extern "C" void vPrintCrashDump(uint32_t *pulFaultStackAddress, int type)
 {
     uint32_t r0;
     uint32_t r1;
@@ -62,8 +63,10 @@ extern "C" void vPrintCrashDump(uint32_t *pulFaultStackAddress)
     pc = pulFaultStackAddress[ 6 ];
     psr = pulFaultStackAddress[ 7 ];
 
-    WI_LOG_ERROR_NOLOCK("Crash: r0 %08x r1 %08x r2 %08x r3 %08x r12 %08x lr %08x pc %08x pssr %08x",
-            r0, r1, r2, r3, r12, lr, pc, psr);
+    WI_LOG_ERROR_NOLOCK("Crash: %d r0 %08x r1 %08x r2 %08x r3 %08x r12 %08x lr %08x pc %08x pssr %08x",
+            type, r0, r1, r2, r3, r12, lr, pc, psr);
+    WI_LOG_ERROR_NOLOCK("Crash: %08x %08x %08x %08x %08x",
+            SCB->HFSR, SCB->CFSR, SCB->BFAR, SCB->MMFAR, pulFaultStackAddress);
     print_stack(pulFaultStackAddress);
 }
 

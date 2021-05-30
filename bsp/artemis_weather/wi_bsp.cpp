@@ -116,4 +116,10 @@ void bsp_measure_chip_temp(int *p_chip_temp)
 
 }
 
+bool bsp_probe_i2c(uint8_t addr)
+{
+    i2c_sensor_bus_->configure(100000);
+    return i2c_sensor_bus_->write(addr, nullptr, 0, 1000);
+}
+
 } // namespace wi

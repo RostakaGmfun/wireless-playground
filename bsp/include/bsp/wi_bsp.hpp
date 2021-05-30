@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace wi
 {
 
@@ -18,5 +20,7 @@ port_gpio &bsp_gpio_get();
 void bsp_measure_vbatt(int *p_vbatt_mv);
 void bsp_measure_vsolar(int *p_vsolar_mv);
 void bsp_measure_chip_temp(int *p_chip_temp);
+
+bool bsp_probe_i2c(uint8_t addr);
 
 } // namespace wi

@@ -19,6 +19,11 @@ public:
         vTimerSetTimerID(ready_timer_, (void *)this);
     }
 
+    ~driver_apds9960()
+    {
+        xTimerDelete(ready_timer_, portMAX_DELAY);
+    }
+
     bool trigger_measurement(uint8_t integration_time_val, void (*ready_cb)(void *ctx), void *ready_cb_ctx)
     {
         ready_callback_ = ready_cb;
@@ -38,6 +43,8 @@ public:
         xTimerChangePeriod(ready_timer_, pdMS_TO_TICKS(timer_period_ms), portMAX_DELAY);
 
         cache_valid_ = false;
+
+        xTimerStart(ready_timer_, portMAX_DELAY);
         return true;
     }
 
