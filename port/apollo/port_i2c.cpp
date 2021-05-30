@@ -53,6 +53,7 @@ bool port_i2c::write(uint8_t addr, const uint8_t *p_data, size_t size, unsigned 
 
     xSemaphoreTake(i2c_semaphore_, 0); // clear semaphore before new transfer
 
+    /*
     if (am_hal_iom_nonblocking_transfer(i2c_handle_, &transaction, [] (void *ctx, uint32_t status) {
                         port_i2c *p_this = static_cast<port_i2c *>(ctx);
                         BaseType_t wakeup_needed = 0;
@@ -64,6 +65,8 @@ bool port_i2c::write(uint8_t addr, const uint8_t *p_data, size_t size, unsigned 
     }
 
     return pdTRUE == xSemaphoreTake(i2c_semaphore_, pdMS_TO_TICKS(timeout_ms));
+    */
+    return 0 == am_hal_iom_blocking_transfer(i2c_handle_, &transaction);
 }
 
 bool port_i2c::read(uint8_t addr, uint8_t *p_data, size_t size, unsigned int timeout_ms)
@@ -84,6 +87,7 @@ bool port_i2c::read(uint8_t addr, uint8_t *p_data, size_t size, unsigned int tim
 
     xSemaphoreTake(i2c_semaphore_, 0); // clear semaphore before new transfer
 
+    /*
     if (am_hal_iom_nonblocking_transfer(i2c_handle_, &transaction, [] (void *ctx, uint32_t status) {
                         port_i2c *p_this = static_cast<port_i2c *>(ctx);
                         BaseType_t wakeup_needed = 0;
@@ -95,6 +99,8 @@ bool port_i2c::read(uint8_t addr, uint8_t *p_data, size_t size, unsigned int tim
     }
 
     return pdTRUE == xSemaphoreTake(i2c_semaphore_, pdMS_TO_TICKS(timeout_ms));
+    */
+    return 0 == am_hal_iom_blocking_transfer(i2c_handle_, &transaction);
 }
 
 bool port_i2c::lock(unsigned int timeout_ms)
