@@ -47,9 +47,8 @@ void sensor_service::task_entry()
         }
 
         driver_apds9960 &als = bsp_apds9960_get();
-        ret = als.trigger_measurement(2, [] (void *ctx) {
+        ret = als.trigger_measurement(240, [] (void *ctx) {
                     sensor_service *p_this = static_cast<sensor_service *>(ctx);
-                    WI_LOG_INFO("apds9960 ready");
                     xSemaphoreGive(p_this->measurement_ready_sem_);
                 }, this);
         if (!ret) {

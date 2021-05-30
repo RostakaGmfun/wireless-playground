@@ -1,5 +1,12 @@
 #pragma once
 
+#include <cstdint>
+#include <algorithm>
+#include "port/port_i2c.hpp"
+
+#include "FreeRTOS.h"
+#include "timers.h"
+
 namespace wi
 {
 
@@ -24,22 +31,25 @@ public:
         xTimerDelete(ready_timer_, portMAX_DELAY);
     }
 
-    bool trigger_measurement(uint8_t integration_time_val, void (*ready_cb)(void *ctx), void *ready_cb_ctx)
+    bool trigger_measurement(uint8_t integration_time_val, void (*ready_cb)(void *ctx),
+            void *ready_cb_ctx)
     {
         ready_callback_ = ready_cb;
         ready_callback_ctx_ = ready_cb_ctx;
 
-        if (!write(ATIME_REG, &integration_time_val, sizeof(integration_time_val))) {
+        uint8_t value[] = { ATIME_REG, integration_time_val};
+        if (!write(ATIME_REG, value, 2)) {
             return false;
         }
 
-        uint8_t enable = ENABLE_PON | ENABLE_AEN;
-        if (!write(ENABLE_REG, &enable, sizeof(enable))) {
+        uint8_t enable_value[] = { ENABLE_REG, ENABLE_PON | ENABLE_AEN};
+        if (!write(ENABLE_REG, enable_value, sizeof(enable_value))) {
             return false;
         }
 
         adc_cycles_ = 256 - integration_time_val;
-        const auto timer_period_ms = std::min(portTICK_PERIOD_MS, (adc_cycles_ * ADC_CYCLE_DURATION + 50) / 100);
+        const auto timer_period_ms = std::max(portTICK_PERIOD_MS,
+                (adc_cycles_ * ADC_CYCLE_DURATION + 50) / 100 + 3);
         xTimerChangePeriod(ready_timer_, pdMS_TO_TICKS(timer_period_ms), portMAX_DELAY);
 
         cache_valid_ = false;
@@ -76,6 +86,12 @@ public:
         if (!read(STATUS_REG, &status, sizeof(status))) {
             return false;
         }
+
+        uint8_t enable = 0;
+        if (!read(ENABLE_REG, &enable, sizeof(enable))) {
+            return false;
+        }
+
         if (!(status & STATUS_AVALID)) {
             return false;
         }
@@ -91,6 +107,19 @@ public:
         b_cache_ = data[6] | (uint16_t)data[7] << 8;
         cache_valid_ = true;
 
+        if (nullptr != p_r) {
+            *p_r = r_cache_;
+        }
+        if (nullptr != p_g) {
+            *p_g = g_cache_;
+        }
+        if (nullptr != p_b) {
+            *p_b = b_cache_;
+        }
+        if (nullptr != p_c) {
+            *p_c = c_cache_;
+        }
+
         return true;
     }
 
@@ -103,11 +132,6 @@ private:
         }
 
         i2c_bus_.configure(i2c_bus_speed_hz);
-
-        if (!i2c_bus_.write(addr_, &reg, sizeof(reg), i2c_lock_timeout_ms)) {
-            i2c_bus_.unlock();
-            return false;
-        }
 
         if (!i2c_bus_.write(addr_, value, size, i2c_lock_timeout_ms)) {
             i2c_bus_.unlock();

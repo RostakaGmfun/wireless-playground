@@ -140,9 +140,9 @@ private:
     static constexpr auto default_timer_period_ms = 100;
     static constexpr auto i2c_bus_speed_hz = 400000;
 
-    static constexpr auto timeout_rep_low_ms = std::min(portTICK_PERIOD_MS, 4LU);
-    static constexpr auto timeout_rep_meidum_ms = std::min(portTICK_PERIOD_MS, 6LU);
-    static constexpr auto timeout_rep_high_ms = std::min(portTICK_PERIOD_MS, 15LU);
+    static constexpr auto timeout_rep_low_ms = std::max(portTICK_PERIOD_MS, 4LU);
+    static constexpr auto timeout_rep_meidum_ms = std::max(portTICK_PERIOD_MS, 6LU);
+    static constexpr auto timeout_rep_high_ms = std::max(portTICK_PERIOD_MS, 15LU);
 };
 
 }; // namepsace wi
