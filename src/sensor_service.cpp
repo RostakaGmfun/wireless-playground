@@ -32,9 +32,10 @@ void sensor_service::task_entry()
 {
     for (int addr = 0; addr < 128; addr++) {
         if (bsp_probe_i2c(addr)) {
-            WI_LOG_INFO("Found I2C slave on %02x", addr);
+            WI_LOG_INFO("I2C slave on %02x", addr);
         }
     }
+    TickType_t wakeup_time = xTaskGetTickCount();
     while (1) {
         int measurements_count = MEASUREMENTS_COUNT;
         driver_sht3x &sht = bsp_sht3x_get();
@@ -64,14 +65,14 @@ void sensor_service::task_entry()
 
         for (int i = 0; i < measurements_count; i++) {
             if (pdTRUE != xSemaphoreTake(measurement_ready_sem_, pdMS_TO_TICKS(1000))) {
-                WI_LOG_ERROR("Sensor timeout");
+                WI_LOG_ERROR("SENSOR timeout");
             }
         }
 
         int temp = 0;
         int rh = 0;
         if (!sht.read_data(&temp, &rh)) {
-            WI_LOG_ERROR("SENSOR_DATA SHT3x read failed");
+            WI_LOG_ERROR("SHT3x read failed");
         }
 
         uint16_t als_r = 0;
@@ -79,7 +80,7 @@ void sensor_service::task_entry()
         uint16_t als_b = 0;
         uint16_t als_c = 0;
         if (!als.read_data(&als_r, &als_g, &als_b, &als_c)) {
-            WI_LOG_ERROR("SENSOR_DATA APDS9960 read failed");
+            WI_LOG_ERROR("APDS9960 read failed");
         }
 
         WI_LOG_INFO("TEMP %d %d", temp, rh);
@@ -89,7 +90,8 @@ void sensor_service::task_entry()
         ble_svc->update_temperature(temp);
         ble_svc->update_humidity(rh);
         ble_svc->update_als(als_r, als_g, als_b, als_c);
-        vTaskDelay(pdMS_TO_TICKS(POLLING_PERIOD_MS));
+        vTaskDelayUntil(&wakeup_time, pdMS_TO_TICKS(POLLING_PERIOD_MS));
+        wakeup_time = xTaskGetTickCount();
     }
 }
 
