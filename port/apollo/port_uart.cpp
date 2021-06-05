@@ -28,7 +28,6 @@ port_uart::port_uart(int id, uint32_t baudrate): id_(id)
     am_hal_uart_configure(uart_handle_, &uart_config);
 
     NVIC_EnableIRQ((IRQn_Type)(UART0_IRQn + id_));
-    am_hal_interrupt_master_enable();
 }
 
 port_uart::~port_uart()
