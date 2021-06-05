@@ -90,6 +90,8 @@ void sensor_service::task_entry()
         ble_svc->update_temperature(temp);
         ble_svc->update_humidity(rh);
         ble_svc->update_als(als_r, als_g, als_b, als_c);
+        ble_svc->update_chip_temp(chip_temp);
+        ble_svc->update_vsolar(vsolar_mv);
         vTaskDelayUntil(&wakeup_time, pdMS_TO_TICKS(POLLING_PERIOD_MS));
         wakeup_time = xTaskGetTickCount();
     }

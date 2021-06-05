@@ -10,6 +10,8 @@
 #define TEMP_UUID_CHR_DATA      0x3011
 #define HUMIDITY_UUID_CHR_DATA  0x3012
 #define ALS_UUID_CHR_DATA       0x3013
+#define CHIP_TEMP_UUID_CHR_DATA 0x3014
+#define VSOLAR_UUID_CHR_DATA    0x3015
 
 namespace wi
 {
@@ -24,6 +26,10 @@ enum
   SENSOR_HANDLE_HUMIDITY,                /*!< \brief Humidity value. */
   SENSOR_HANDLE_ALS_CHR,                 /*!< \brief ALS value characteristic. */
   SENSOR_HANDLE_ALS,                     /*!< \brief ALS value. */
+  SENSOR_HANDLE_CHIP_TEMP_CHR,           /*!< \brief Chip temp value characteristic. */
+  SENSOR_HANDLE_CHIP_TEMP,               /*!< \brief Chip temp value. */
+  SENSOR_HANDLE_VSOLAR_CHR,              /*!< \brief vsolar value characteristic. */
+  SENSOR_HANDLE_VSOLAR,                  /*!< \brief vsolar value. */
 
   SENSOR_HANDLE_END_PLUS_ONE             /*!< \brief Maximum handle. */
 };
@@ -62,6 +68,26 @@ static const uint16_t alsLenDataChr   = sizeof(alsValDataChr);
 static const uint8_t  alsUuidData[] = {UINT16_TO_BYTES(ALS_UUID_CHR_DATA)};
 static       uint8_t  alsValData[4 * sizeof(uint16_t)]  = {0x00};
 static const uint16_t alsLenData    = sizeof(alsValData);
+
+/* Chip temp characteristic. */
+static const uint8_t  chipTempValDataChr[] = {ATT_PROP_READ,
+                                          UINT16_TO_BYTES(SENSOR_HANDLE_CHIP_TEMP)};
+static const uint16_t chipTempLenDataChr   = sizeof(chipTempValDataChr);
+
+/* Chip temp data. */
+static const uint8_t  chipTempUuidData[] = {UINT16_TO_BYTES(CHIP_TEMP_UUID_CHR_DATA)};
+static       uint8_t  chipTempValData[sizeof(uint16_t)]  = {0x00};
+static const uint16_t chipTempLenData    = sizeof(chipTempValData);
+
+/* Vsolar characteristic. */
+static const uint8_t  vsolarValDataChr[] = {ATT_PROP_READ,
+                                          UINT16_TO_BYTES(SENSOR_HANDLE_VSOLAR)};
+static const uint16_t vsolarLenDataChr   = sizeof(vsolarValDataChr);
+
+/* Chip temp data. */
+static const uint8_t  vsolarUuidData[] = {UINT16_TO_BYTES(VSOLAR_UUID_CHR_DATA)};
+static       uint8_t  vsolarValData[sizeof(uint16_t)]  = {0x00};
+static const uint16_t vsolarLenData    = sizeof(vsolarValData);
 
 /* Attribute list for temp group. */
 static const attsAttr_t tempList[] =
@@ -129,6 +155,42 @@ static const attsAttr_t tempList[] =
     0,
     ATTS_PERMIT_READ
   },
+  /* Chip temp Characteristic declaration. */
+  {
+    attChUuid,
+    (uint8_t *) chipTempValDataChr,
+    (uint16_t *) &chipTempLenDataChr,
+    sizeof(chipTempValDataChr),
+    0,
+    ATTS_PERMIT_READ
+  },
+  /* Chip temp Characteristic value. */
+  {
+    chipTempUuidData,
+    (uint8_t *) chipTempValData,
+    (uint16_t *) &chipTempLenData,
+    sizeof(chipTempValData),
+    0,
+    ATTS_PERMIT_READ
+  },
+  /* vsolar Characteristic declaration. */
+  {
+    attChUuid,
+    (uint8_t *) vsolarValDataChr,
+    (uint16_t *) &vsolarLenDataChr,
+    sizeof(vsolarValDataChr),
+    0,
+    ATTS_PERMIT_READ
+  },
+  /* Chip temp Characteristic value. */
+  {
+    vsolarUuidData,
+    (uint8_t *) vsolarValData,
+    (uint16_t *) &vsolarLenData,
+    sizeof(vsolarValData),
+    0,
+    ATTS_PERMIT_READ
+  },
 };
 
 class ble_sensor_svc: public ble_sensor_listener
@@ -163,6 +225,18 @@ public:
                                                  UINT16_TO_BYTES(b),
                                                  UINT16_TO_BYTES(c)};
         AttsSetAttr(SENSOR_HANDLE_ALS, sizeof(alsData), alsData);
+    }
+
+    void update_chip_temp(int chip_temp_celsium) override
+    {
+        uint8_t tempData[2] = {UINT16_TO_BYTES((uint16_t)chip_temp_celsium)};
+        AttsSetAttr(SENSOR_HANDLE_CHIP_TEMP, sizeof(tempData), tempData);
+    }
+
+    void update_vsolar(int vsolar_mv) override
+    {
+        uint8_t vsolarData[2] = {UINT16_TO_BYTES((uint16_t)vsolar_mv)};
+        AttsSetAttr(SENSOR_HANDLE_VSOLAR, sizeof(vsolarData), vsolarData);
     }
 
 private:
